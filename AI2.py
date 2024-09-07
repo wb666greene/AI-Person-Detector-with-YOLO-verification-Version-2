@@ -1221,6 +1221,7 @@ def FErtsp_thread(inframeQ, Nfe, FEoffset, PTZparam, camn, URL):
     global __fisheyeThread__
     global threadLock
     global threadsRunning
+    __fisheyeThread__ = True
     ocnt=[]
     for i in range(Nfe):
         ocnt.append(0)      # init counter array

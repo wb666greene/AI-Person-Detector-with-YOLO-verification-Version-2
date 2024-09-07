@@ -314,6 +314,7 @@ python AI2.py -d -y8v
 ```
 This will start a thread for each video camaera and an OpenVINO CPU AI thread and display live results on the screen.  Here is an image of it running on a Lenovo IdeaPad i3 laptop doing six Onvif cameras:
 ![IdeaPad](https://github.com/user-attachments/assets/647f3c54-a265-406a-833d-0ef1a2883eec)  Notifications and the housekeeping functions are done with node-red which we will install next.  Press Ctrl-C in the terminal window to exit the AI python code.  My GTX950 had a YOLO8 inference time of about 59 mS with about 5 mS pre & post processing times.
+#### If you have a "fish eye" camera and want to use it, message me for how to.
 
 # 4) Install Node-red
 Node-red has a very active and helpful community with lots of good tutorials, a vist to their support forum is recommended: https://discourse.nodered.org/

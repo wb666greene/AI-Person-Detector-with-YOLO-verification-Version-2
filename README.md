@@ -26,7 +26,7 @@ This is the first frame of the sequence so you can get an idea of the sensitivit
 
 
 # 0) Install Ubuntu 22.04
-I used Ubuntu-Mate.  Customize it as you see fit.
+I used Ubuntu-Mate.  Customize it as you see fit.  It has also been tested on Ubuntu 20.04, with differences in the installation commands pointed out when you'll encounter them.
 
 If you are new to Linux, first thing after installing Ubuntu-Mate, go through the "Welcome" tutorial to learn the basics and then go to the "Control Center" and open "MATE Tweak" and from the sidebar select "Panel".  If you choose "Redmon" from the dropdown you'll get a destop that resembles Windows, if you choose "Cupetino" you'll get a Mac-like desktop.  If you can tolerate the Ubuntu "Unity" Desktop, fine, but I can't, and if coming from Windows or Mac be prepared for "eveything you know is wrong" when it comes to using the Unity desktop UI.
 
@@ -126,9 +126,8 @@ https://github.com/hjonnala/snippets/tree/main/wheels/python3.10
 
 #### If using 20.04 you need the python3.8 versions instead:
 ```
-https://github.com/google-coral/pycoral/releases/download/v2.0.0/pycoral-2.0.0-cp38-cp38-linux_x86_64.whl
-https://github.com/google-coral/pycoral/releases/download/v2.0.0/tflite_runtime-2.5.0.post1-cp38-cp38-linux_x86_64.whl
-# I downloaded these to the TPU_python3.8 directory.
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
+# This is the easiest way, but it doesn't support python newer than 3.9.
 ```
 We'll use these when we create the virtual environment below.
 
@@ -302,7 +301,9 @@ rtsp://192.168.2.77:554/stream0?username=admin&password=CE04588A3231F95BEE71848F
 ```
 The The IP addresses will be what your router assigns, my example shows two security DVRs at xxx.xxx.xxx.28 and xxx.xxx.xxx.49 and two IP or "netcams" the last netcam generates the password as part of the Onvif setup and can be "tricky" to figure out, but they are not generally unique.  Best way I know to test your RTSP URLs is with VLC and "Open Network Connection" and enter the RTSP URL string.  Main negative of RTSP streams is the latency is typically 2-4 seconds behind "real time".
 
+### Make sure the system is connected to the Internet, so the first run can download and convert the yolo8 models.
 Once the camera URLs are specified (both types of camera files are allowed) we can run a quick test, make sure the virtual environment is active and open up a command window (terminal):
+#### Some python modules may get updated during the conversion, be patient it can take a couple of minutes.
 ```
 source y8ovv/bin/activate
 python AI2.py -d -y8ovv
@@ -312,7 +313,17 @@ Or if using cuda:
 source y8cuda/bin/activate
 python AI2.py -d -y8v
 ```
-This will start a thread for each video camaera and an OpenVINO CPU AI thread and display live results on the screen.  Here is an image of it running on a Lenovo IdeaPad i3 laptop doing six Onvif cameras:
+Or if using a TPU:
+```
+source y8tpu/bin/activate
+python AI2.py -d -y8tpu
+```
+Or if using two TPUs
+```
+source y8tpu/bin/activate
+python AI2.py -d -tpu -y8tpu
+```
+This will start a thread for each video camaera and an OpenVINO SSD CPU (or TPU) AI thread and and a yolo8 verification thread, and display live results on the screen.  Here is an image of it running on a Lenovo IdeaPad i3 laptop doing six Onvif cameras:
 ![IdeaPad](https://github.com/user-attachments/assets/647f3c54-a265-406a-833d-0ef1a2883eec)  Notifications and the housekeeping functions are done with node-red which we will install next.  Press Ctrl-C in the terminal window to exit the AI python code.  My GTX950 had a YOLO8 inference time of about 59 mS with about 5 mS pre & post processing times.
 #### If you have a "fish eye" camera and want to use it, message me for how to.
 

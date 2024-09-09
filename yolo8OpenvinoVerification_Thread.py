@@ -29,11 +29,17 @@ from pathlib import Path
 
 global __Thread__
 __Thread__ = False
+
 global __verifyConf__
 __verifyConf__ = 0.75
+
 global __y8modelSTR__
 __y8modelSTR__ = 'yolov8l'
+
 global model
+
+global __CONVERTING__
+__CONVERTING__ = True
 
 
 def yolo8ov_thread(resultsQ, yoloQ):
@@ -41,7 +47,8 @@ def yolo8ov_thread(resultsQ, yoloQ):
     global __verifyConf__
     global model
     global __y8modelSTR__
-
+    global __CONVERTING__
+    
     print("Starting Yolo v8 verification thread...\n")
     if yoloQ is None:
         print(    "ERROR! no yolo Queue!")
@@ -61,6 +68,7 @@ def yolo8ov_thread(resultsQ, yoloQ):
     if not det_model_path.exists():
         print('\n[INFO] Exporting yolo model to OpenVINO format...')
         det_model.export(format="openvino", dynamic=True, half=True)
+    __CONVERTING__ = False
     print('\n[INFO] Using OpenVINO: ' + ov.__version__)
     core = ov.Core()
     ov_config = {}

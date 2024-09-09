@@ -278,9 +278,9 @@ def AI_thread(results, inframe, cameraLock, nextCamera, Ncameras,
             continue
     # Thread exits
     cfps.stop()    # stop the FPS counter timer
-    print("\n" + aiStr + ", waited: " + str(waits) + " dropped: " + str(dcnt+ncnt+ecnt) + " out of "
+    print(aiStr + ", waited: " + str(waits) + " dropped: " + str(dcnt+ncnt+ecnt) + " out of "
          + str(fcnt) + " images.  AI: {:.2f} inferences/sec".format(cfps.fps()))
     print("   " + aiStr + " Persons Detected: " + str(detect) + ",  Frames with no person: " + str(noDetect))
     print("   " + aiStr + " " + str(TPU_verify_fail) + " TPU detections failed zoom-in verification.")
-    print("   " + aiStr + " Detections dropped: " + str(dcnt) + ", results dropped: " + str(ncnt) + ", results.put() exceptions: " + str(ecnt) + "\n")
+    print("   " + aiStr + " Detections dropped: " + str(dcnt) + ", results dropped: " + str(ncnt) + ", results.put() exceptions: " + str(ecnt))
 

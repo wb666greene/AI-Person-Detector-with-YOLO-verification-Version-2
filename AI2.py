@@ -646,8 +646,8 @@ def main():
             if sleepCount >= 15:
                 client.publish("AI/Status", "[ERROR] Coral_TPU_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] Coral_TPU_Thread failed to start, exiting...')
-                quit()
-
+                QUIT = True
+    client.publish("AI/Status", "Coral TPU thread is running.", 2, True)
 
     # ** setup and start openvino CPU AI thread.
     if nCPUthreads is True:
@@ -662,19 +662,31 @@ def main():
         # We no longer instance the model here and pass it to the thread, instance it in the thread.
         CPUt.append(Thread(target=OpenVINO_SSD_Thread.AI_thread,
                     args=(resultsQ, inframeQ, cameraLock, nextCamera, Ncameras,
-                    PREPROCESS_DIMS, confidence-0.1, verifyConf-0.1, "SSDv2_IR10_CPU", blobThreshold, yoloQ)))
+                    PREPROCESS_DIMS, confidence, verifyConf, "SSDv2_IR10_CPU", blobThreshold, yoloQ)))
         CPUt[0].start()
         # wait for OpenVINO_SSD_Thread to start, so I can see any error messages can be tough to tell which thread they are from.
         sleepCount=0
         while OpenVINO_SSD_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
-            if sleepCount >= 15:
+            while OpenVINO_SSD_Thread.__CONVERTING__ is True:
+                if sleepCount == 1:
+                    print('Converting MobilenetSSD_v2 to openvino, be patient!')
+                    client.publish("AI/Status", "Converting MobilenetSSD_v2 to openvino, be patient!", 2, True)
+                    sleepCount+=1
+                    toggle = 1
+                time.sleep(3.0)
+                if toggle == 1:
+                    client.publish("AI/Status", "Converting MobilenetSSD_v2 working...", 2, True)
+                else:
+                    client.publish("AI/Status", "Converting MobilenetSSD_v2 still working...", 2, True)
+                toggle = (toggle+1)%2    
+            if sleepCount >= 30:
                 client.publish("AI/Status", "[ERROR] OpenVINO_SSD_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] OpenVINO_SSD_Thread failed to start, exiting...')
-                quit()
+                QUIT = True
+        client.publish("AI/Status", "OpenVINO MobilenetSSD_v2 thread is running.", 2, True)
             
-
 
     if OVyolo8_verify:
         # Start dopenvino yolo8 thread
@@ -688,11 +700,25 @@ def main():
         while yolo8OpenvinoVerification_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
-            if sleepCount >= 25:
+            while yolo8OpenvinoVerification_Thread.__CONVERTING__ is True:
+                if sleepCount == 1:
+                    print('Downloading and converting yolo8 openvino model, be patient!')
+                    client.publish("AI/Status", "Converting Ultralytics OpenVINO Yolo8 model, be patient!", 2, True)
+                    sleepCount+=1   
+                    toggle = 1
+                time.sleep(3.0)
+                if toggle == 1:
+                    client.publish("AI/Status", "Converting openvino yolo8 working...", 2, True)
+                else:
+                    client.publish("AI/Status", "Converting openvino yolo8 still working...", 2, True)
+                toggle = (toggle+1)%2    
+            if sleepCount >= 30:
                 print('[ERROR] OpenVINO yolo8 thread failed to start, exiting...')
                 client.publish("AI/Status", "[ERROR] OpenVINO yolo8 thread failed to start, exiting...", 2, True)
-                quit()
+                QUIT = True
         print("[INFO] OpenVINO yolo_v8 verification thread is running. ")
+        client.publish("AI/Status", "OpenVINO yolo8 verification thread is running.", 2, True)
+
 
     if yolo8_verify or TPUyolo8_verify:
         if TPUyolo8_verify:
@@ -710,6 +736,18 @@ def main():
         while yolo8_verification_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
+            while yolo8_verification_Thread.__CONVERTING__ is True:
+                if sleepCount == 1:
+                    print('Downloading and converting yolo8 model, be patient!')
+                    client.publish("AI/Status", "Converting Ultralytics model, be patient!", 2, True)
+                    sleepCount+=1
+                    toggle = 1
+                time.sleep(3.0)
+                if toggle == 1:
+                    client.publish("AI/Status", "Converting yolo8 model working...", 2, True)
+                else:
+                    client.publish("AI/Status", "Converting yolo8 still working...", 2, True)
+                toggle = (toggle+1)%2    
             if sleepCount >= 30:
                 if TPUyolo8_verify:
                     client.publish("AI/Status", "[ERROR] TPU yolo8 thread failed to start, exiting...", 2, True)
@@ -717,7 +755,12 @@ def main():
                 else:
                     client.publish("AI/Status", "[ERROR] CUDA yolo8 thread failed to start, exiting...", 2, True)
                     print('[ERROR] CUDA yolo8 thread failed to start, exiting...')
-                #quit()
+                QUIT = True
+        if TPUyolo8_verify:
+            client.publish("AI/Status", "Ultralytics TPU yolo8 verification thread is running.", 2, True)
+        else:
+            # Start Ultralytics yolo8 verification thread
+            client.publish("AI/Status", "Ultralytics CUDA yolo8 verification thread is running.", 2, True)
         print("[INFO] Ultralytics yolo_v8 verification thread is running. ")
 
 
@@ -969,10 +1012,10 @@ def main():
 
     # stop Yolo v8 AI Thread
     if OVyolo8_verify:
-        print("[INFO] Stopping OpenVINO yolo8 verification Thread ...")
+        print("\n[INFO] Stopping OpenVINO yolo8 verification Thread ...")
         yolo8OpenvinoVerification_Thread.__Thread__ = False
         yolo8ov[0].join()
-        print("[INFO] OpenVINO yolov8 verification Thread has exited.")
+        print("[INFO] OpenVINO yolov8 verification Thread has exited.\n")
         client.publish("AI/Status", "OpenVINO yolov8 verification Thread has exited.", 2, True)
     # Stop and wait for capture threads to exit
     if Nonvif > 0:
@@ -1002,33 +1045,33 @@ def main():
 
     # stop TPU AI thread
     if nCoral is True:
-        print("[INFO] Stopping TPU Thread ...")
+        print("\n[INFO] Stopping TPU Thread ...")
         Coral_TPU_Thread.__Thread__ = False   # maybe my QUITf() was clenaer, but I can stage the thread exits for debugging.
         Ct[0].join()
-        print("[INFO] Coral TPU AI Thread has exited.")
+        print("[INFO] Coral TPU AI Thread has exited.\n")
         client.publish("AI/Status", "Coral TPU thread has exited.", 2, True)
 
     # Stop OpenVINO CPU thread
     if nCPUthreads is True:
-        print("[INFO] Stopping openvino CPU AI  Thread ...")
+        print("\n[INFO] Stopping openvino CPU AI  Thread ...")
         OpenVINO_SSD_Thread.__Thread__ = False
         CPUt[0].join()
-        print("[INFO] CPU AI Thread has exited.")
+        print("[INFO] CPU AI Thread has exited.\n")
         client.publish("AI/Status", "CPU AI  Thread has exited.", 2, True)
 
     #$$$#  stop yolo verify thread
     if yolo8_verify or TPUyolo8_verify:
         if TPUyolo8_verify:
-            print("[INFO] Stopping TPU yolo8 verification Thread ...")
+            print("\n[INFO] Stopping TPU yolo8 verification Thread ...")
         else:
-            print("[INFO] Stopping CUDA yolo8 verification Thread ...")
+            print("\n[INFO] Stopping CUDA yolo8 verification Thread ...")
         yolo8_verification_Thread.__Thread__ = False
         yolo8[0].join()
         if TPUyolo8_verify:
-            print("[INFO] yolov8 TPU verification Thread has exited.")
+            print("[INFO] yolov8 TPU verification Thread has exited.\n")
             client.publish("AI/Status", "TPU yolov8 verification Thread has exited.", 2, True)
         else:
-            print("[INFO] yolov8 CUDA verification Thread has exited.")
+            print("[INFO] yolov8 CUDA verification Thread has exited.\n")
             client.publish("AI/Status", "CUDA yolov8 verification Thread has exited.", 2, True)
 
     # destroy all windows if we are displaying them

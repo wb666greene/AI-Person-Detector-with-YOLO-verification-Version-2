@@ -30,6 +30,8 @@ __VERIFY_DIMS__ = (300,300)
 global __Color__
 __Color__ = (0, 200, 200)
 
+global __CONVERTING__
+__CONVERTING__ = True
 
 ## *** OpenVINO 2024 CPU SSD AI Thread ***
 #******************************************************************************************************************
@@ -39,7 +41,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
     global __Thread__
     global __VERIY_DIMS__
     global __Color__
-
+    global __CONVERTING__
     fcnt=0
     waits=0
     dcnt=0
@@ -56,11 +58,13 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
         MO_2021 = True
         model_path = 'mobilenet_ssd_v2/MobilenetSSDv2cocoIR10.xml'   # my IR10 conversion done with openvino 2021.3
         aiStr = dnnTarget
+        __CONVERTING__ = False
     else:
         aiStr = 'ovCPU'
         MO_2021 = False
         if os.path.exists('mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml'): # ov converted and saved model from 2018 
             model_path = 'mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml'
+            __CONVERTING__ = False
         else:
             if os.path.exists('../ssd_mobilenet_v2_coco_2018_03_29'):
                 print('[INFO] Converting downloaded ssd_mobilenet_v2_coco_2018_03_29 model, be patient ...')
@@ -68,6 +72,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
                 print('[INFO] Saving converted mode, so this step can be skipped on the next program run.')
                 ov.save_model(model,'mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml')
                 model_path = 'mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml'
+                __CONVERTING__ = False
             else:
                 print('[ERROR] ssd_mobilenet_v2_coco_2018_03_29 has not been found!')
                 print('     Download it to one level above AI2 directory with:')
@@ -75,6 +80,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
                 print('wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz')
                 print('tar -zxf ssd_mobilenet_v2_coco_2018_03_29.tar.gz')
                 print(' Exiting...')
+                __CONVERTING__ = False
                 quit()
     
     
@@ -357,7 +363,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
             continue
     # Thread exits
     cfps.stop()    # stop the FPS counter timer
-    print("\nOpenVINO CPU MobilenetSSD AI thread " + aiStr + ", waited: " + str(waits) + " dropped: " + str(ecnt+dcnt+ncnt) + " of "
+    print("OpenVINO CPU MobilenetSSD AI thread " + aiStr + ", waited: " + str(waits) + " dropped: " + str(ecnt+dcnt+ncnt) + " of "
          + str(fcnt) + " images.  AI: {:.2f} inferences/sec".format(cfps.fps()))
     print("    " + aiStr + " Persons Detected: " + str(detect) + ",  Frames with no person: " + str(noDetect))
     print("    " + aiStr + " " + str(DNN_verify_fail) + " detections failed zoom-in verification.")

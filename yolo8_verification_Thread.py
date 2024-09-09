@@ -38,6 +38,8 @@ __Color__ = (0, 200, 200)
 global __useTPU__
 __useTPU__ = False
 
+global __CONVERTING__
+__CONVERTING__ = True
 
 '''
 one time code to run when thread is launched.
@@ -46,6 +48,7 @@ def threadInit():
     global model
     global __y8modelSTR__
     global __useTPU__
+    global __CONVERTING__
     
     models_dir = Path("./yolo8")
     models_dir.mkdir(exist_ok=True)
@@ -71,6 +74,7 @@ def threadInit():
             print('[INFO] Converting yolov8s model to edgetpu format.')
             model = YOLO('yolo8/yolov8s')
             model.export(format="edgetpu", imgsz=512)
+        __CONVERTING__ = False
 
         # load the model 
         model = YOLO('yolo8/yolov8s_saved_model/yolov8s_full_integer_quant_edgetpu.tflite',task='detect', verbose=False)
@@ -80,6 +84,7 @@ def threadInit():
         # Load the YOLOv8 model
         model = YOLO(__y8modelSTR__)
         print("[INFO] Using " + __y8modelSTR__ + " yolo8 pre-trained model")
+        __CONVERTING__ = False
     return
 
 
@@ -180,7 +185,7 @@ def yolov8_thread(results, yoloQ):
             ecnt+=1
             print('[Exception] yolo_thread'+ str(cam) + ': ' + str(e))
             continue
-    print("\nYolo v8 frames Verified: {}, Rejected: {},  Waited: {} seconds.".format(str(yoloVerified), str(yoloRejected), str(yoloWaited)))
-    print("    Verified dropped: " + str(dcnt) + " results dropped: " + str(ncnt) + " results.put() exceptions: " + str(ecnt) +"\n")
+    print("Yolo v8 frames Verified: {}, Rejected: {},  Waited: {} seconds.".format(str(yoloVerified), str(yoloRejected), str(yoloWaited)))
+    print("    Verified dropped: " + str(dcnt) + " results dropped: " + str(ncnt) + " results.put() exceptions: " + str(ecnt))
 
 

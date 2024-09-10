@@ -303,6 +303,7 @@ The The IP addresses will be what your router assigns, my example shows two secu
 ### Make sure the system is connected to the Internet, so the first run can download and convert the yolo8 models.
 Once the camera URLs are specified (both types of camera files are allowed) we can run a quick test, make sure the virtual environment is active and open up a command window (terminal):
 #### Some python modules may get updated during the conversion, be patient it can take a couple of minutes.
+This is why it is strongly recommended to do the first run in a terminal so you can see the downloading and conversion take place, and see any error messages should you have forgetten a step.
 ```
 source y8ovv/bin/activate
 python AI2.py -d -y8ovv

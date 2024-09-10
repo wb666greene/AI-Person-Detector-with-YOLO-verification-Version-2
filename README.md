@@ -155,9 +155,8 @@ pip install "torch>=2.1" "torchvision>=0.16" "ultralytics==8.2.24" onnx tqdm ope
 # if using TPU
 pip install TPU_python3.10/tflite_runtime-2.5.0.post1-cp310-cp310-linux_x86_64.whl
 pip install TPU_python3.10/pycoral-2.0.0-cp310-cp310-linux_x86_64.whl
-# or if using 20.04
-pip install TPU_python3.8/tflite_runtime-2.5.0.post1-cp38-cp38-linux_x86_64.whl
-pip install TPU_python3.8/pycoral-2.0.0-cp38-cp38-linux_x86_64.whl
+# or if using 20.04, easier but doesn't support newer than python 3.9
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 
 ```
 If necessary, exit the virtual environment with "deactive" and the (y8ovv) prefix should disappear from the prompt.
@@ -210,13 +209,13 @@ pip install ultralytics
 # Only if uisng TPU
 pip install TPU_python3.10/tflite_runtime-2.5.0.post1-cp310-cp310-linux_x86_64.whl
 pip install TPU_python3.10/pycoral-2.0.0-cp310-cp310-linux_x86_64.whl
-# or if using 20.04
-pip install TPU_python3.8/tflite_runtime-2.5.0.post1-cp38-cp38-linux_x86_64.whl
-pip install TPU_python3.8/pycoral-2.0.0-cp38-cp38-linux_x86_64.whl
-```
+# or if using 20.04, easier but doesn't support newer than python 3.9
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
+``
 In the virtual environment test the cuda/pytorch install with:
 ```
 (y8cuda) ai@GTX950:~$ python
+```
 Python 3.10.12 (main, Jul 29 2024, 16:56:48) [GCC 11.4.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import torch
@@ -225,7 +224,7 @@ True
 >>> #Ctrl-d to exit
 ```
 ## 2c) Create virtual environment for TPU yolo8:
-(Don't forget sudo apt install python3.8-venv, if you didn't do it in step 0)
+(Don't forget sudo apt install python3.X-venv, if you didn't do it in step 0)
 ```
 # set up virtual environment for yolo8 on Coral TPU
 python3 -m venv y8tpu
@@ -234,9 +233,8 @@ source y8tpu/bin/activate
 pip install -U pip setuptools
 pip install TPU_python3.10/tflite_runtime-2.5.0.post1-cp310-cp310-linux_x86_64.whl
 pip install TPU_python3.10/pycoral-2.0.0-cp310-cp310-linux_x86_64.whl
-# or if using 20.04
-pip install TPU_python3.8/tflite_runtime-2.5.0.post1-cp38-cp38-linux_x86_64.whl
-pip install TPU_python3.8/pycoral-2.0.0-cp38-cp38-linux_x86_64.whl
+# or if using 20.04, easier but doesn't support newer than python 3.9
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 pip install opencv-python
 #install openvino, not strictly necessary, but need it if you want CPU MobilenetSSD_v2 AI
 pip install "openvino>=2024.2.0" "nncf>=2.9.0"
@@ -244,6 +242,7 @@ pip install "torch>=2.1" "torchvision>=0.16" "ultralytics==8.2.24" onnx tqdm ope
 pip install imutils paho-mqtt requests
 ```
 Nothing special needs to be done except for installing the TPU drivers for multiple TPUs.  Two USB can skip the M.2 steps, The USB should all be taken care of by the apt install.
+
 # 3) Clone this repo
 ```
 git clone https://github.com/wb666greene/AI-Person-Detector-with-YOLO-verification-Version-2.git

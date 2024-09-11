@@ -637,13 +637,14 @@ TPU, waited: 59899 dropped: 159 out of 148014 images.  AI: 14.65 inferences/sec
    TPU 8182 TPU detections failed zoom-in verification.
    TPU Detections dropped: 0, results dropped: 159, results.put() exceptions: 0
 ```
-Easily supports 4UHD (4K) cameras, not very usable without Coral TPU.
+Easily supports 4 UHD (4K) cameras, but not very usable without Coral TPU. A test run with 9 UHD
+cameras did 28.4 fps which is basically processing every frame for 9 cameras at ~3 fps per camera.
 This board is ~$160, by time you add M.2 TPU, power supply and M.2 SSD
 you are over $230, which is why I've lost interest in IOT class hardware
 and think "last year's model bottom of the line" laptop close-outs or
 "buisness class" refubished laptops are a better bet if cost matters
 more than physical space, since basically has to be "headless" if cost matters.
-Here is a photo of the YouYeeTwoX1, it is a bit larger than a RasperryPi:
+Here is a photo of the YouYeeTwoX1, it is a bit larger than a RaspberryPi:
 ![YouyeetooX1](https://github.com/user-attachments/assets/54c51644-a9e0-4af6-bb9f-7d885c1ffd94)
 Running headless, only the coaxial power connector and Ethernet cable would be plugged in, along with a powered speaker, not shown in the photo, if you want audio (usually you will).
 ### Old i5-4200U with iGPU not compatible with openvino using two TPUs and 9 UHD (4K) cameras.
@@ -664,4 +665,4 @@ TPU, waited: 5745 dropped: 564 out of 155037 images.  AI: 27.95 inferences/sec
    TPU 4762 TPU detections failed zoom-in verification.
    TPU Detections dropped: 0, results dropped: 564, results.put() exceptions: 0
 ```
-Since each camera is ~3fps this is basically processing every frame.  Running with only a single TPU and using CPU for the SSD AI, basically got 9.5fps, which is usable but not optimum. But you can start with a single tpu and three or four cameras, and then add another TPU (USB ~$60, M.2 ~$30) when adding more cameras.
+Since each camera is ~3fps this is basically processing every frame.  Running with only a single TPU and using CPU for the SSD AI, basically got 9.5fps, which is usable for 4 cameras, but not optimum. You can start with a single tpu and three or four cameras, and then add another TPU (USB ~$60, M.2 ~$30) when adding more cameras.

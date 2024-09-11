@@ -34,13 +34,15 @@ global __verifyConf__
 __verifyConf__ = 0.75
 
 global __y8modelSTR__
-__y8modelSTR__ = 'yolov8l'
+__y8modelSTR__ = 'yolov8m'
 
 global model
 
 global __CONVERTING__
-__CONVERTING__ = True
+__CONVERTING__ = False
 
+global QUIT
+QUIT = False
 
 def yolo8ov_thread(resultsQ, yoloQ):
     global __Thread__
@@ -48,8 +50,9 @@ def yolo8ov_thread(resultsQ, yoloQ):
     global model
     global __y8modelSTR__
     global __CONVERTING__
+    global QUIT
     
-    print("Starting Yolo v8 verification thread...\n")
+    print("Starting yolo8ov_thread...")
     if yoloQ is None:
         print(    "ERROR! no yolo Queue!")
         return -1
@@ -65,11 +68,13 @@ def yolo8ov_thread(resultsQ, yoloQ):
     res = det_model('TestDetection.jpg', conf=__verifyConf__-0.001, verbose=False)    #Dummy inference to initialize object, better way?  But this works!
     # object detection model  export to OpenVINO format
     det_model_path = models_dir / f"{__y8modelSTR__}_openvino_model/{__y8modelSTR__}.xml"
+    ###print(det_model_path)
     if not det_model_path.exists():
+        __CONVERTING__ = True
         print('\n[INFO] Exporting yolo model to OpenVINO format...')
         det_model.export(format="openvino", dynamic=True, half=True)
     __CONVERTING__ = False
-    print('\n[INFO] Using OpenVINO: ' + ov.__version__)
+    print('[INFO] Using OpenVINO: ' + ov.__version__)
     core = ov.Core()
     ov_config = {}
     det_ov_model = core.read_model(det_model_path)

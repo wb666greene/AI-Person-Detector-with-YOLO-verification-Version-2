@@ -39,8 +39,10 @@ global __useTPU__
 __useTPU__ = False
 
 global __CONVERTING__
-__CONVERTING__ = True
+__CONVERTING__ = False
 
+global QUIT
+QUIT = False
 '''
 one time code to run when thread is launched.
 '''
@@ -49,6 +51,7 @@ def threadInit():
     global __y8modelSTR__
     global __useTPU__
     global __CONVERTING__
+    global QUIT
     
     models_dir = Path("./yolo8")
     models_dir.mkdir(exist_ok=True)
@@ -70,6 +73,7 @@ def threadInit():
         # test if model has been converted, if not convert it
         det_model_path = models_dir / f"yolov8s_saved_model/yolov8s_full_integer_quant_edgetpu.tflite"
         if not det_model_path.exists():
+            __CONVERTING__ = True
             # load and convert ultralytics yolo8 model
             print('[INFO] Converting yolov8s model to edgetpu format.')
             model = YOLO('yolo8/yolov8s')
@@ -129,7 +133,7 @@ def yolov8_thread(results, yoloQ):
     global __verifyConf__
     global __Color__
     global __useTPU__
-    
+    global QUIT
     print("Starting Yolo v8 verification thread...")
     if yoloQ is None:
         print(    "ERROR! no yolo Queue!")
@@ -147,7 +151,7 @@ def yolov8_thread(results, yoloQ):
         print("Yolo v8 CUDA verification thread is running...")
     __Thread__ = True
 
-    while __Thread__ is True:
+    while __Thread__ is True and not QUIT:
         try:
             # ssd_frame is full camera resolution with SSD detection box overlaid
             # yolo_frame is "zoomed in" on the SSD detection box and resized to 608x608 for darknet yolo4 inference

@@ -31,7 +31,10 @@ global __Color__
 __Color__ = (0, 200, 200)
 
 global __CONVERTING__
-__CONVERTING__ = True
+__CONVERTING__ = False
+
+global QUIT
+QUIT = False
 
 ## *** OpenVINO 2024 CPU SSD AI Thread ***
 #******************************************************************************************************************
@@ -42,6 +45,8 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
     global __VERIY_DIMS__
     global __Color__
     global __CONVERTING__
+    global QUIT
+    
     fcnt=0
     waits=0
     dcnt=0
@@ -58,15 +63,14 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
         MO_2021 = True
         model_path = 'mobilenet_ssd_v2/MobilenetSSDv2cocoIR10.xml'   # my IR10 conversion done with openvino 2021.3
         aiStr = dnnTarget
-        __CONVERTING__ = False
     else:
         aiStr = 'ovCPU'
         MO_2021 = False
         if os.path.exists('mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml'): # ov converted and saved model from 2018 
             model_path = 'mobilenet_ssd_v2/ssd_mobilenet_v2_coco_2018_03_29.xml'
-            __CONVERTING__ = False
         else:
             if os.path.exists('../ssd_mobilenet_v2_coco_2018_03_29'):
+                __CONVERTING__ = True
                 print('[INFO] Converting downloaded ssd_mobilenet_v2_coco_2018_03_29 model, be patient ...')
                 model = ov.convert_model('../ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb')
                 print('[INFO] Saving converted mode, so this step can be skipped on the next program run.')
@@ -81,8 +85,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
                 print('tar -zxf ssd_mobilenet_v2_coco_2018_03_29.tar.gz')
                 print(' Exiting...')
                 __CONVERTING__ = False
-                quit()
-    
+                QUIT = True
     
     device_name = 'CPU'
     __VERIFY_DIMS__ = PREPROCESS_DIMS
@@ -112,7 +115,8 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
 
     if len(model.inputs) != 1:
         log.error('Supports only single input topologies.')
-        return -1
+        QUIT = True
+        return -1   # I don't think this error handling is very clean, but shouldn't happen
     '''
     if len(model.outputs) != 1:
         log.error('Supports only single output topologies')
@@ -167,7 +171,7 @@ def AI_thread(resultsQ, inframe, cameraLock, nextCamera, Ncameras,
     __Thread__ = True
     print("[INFO] OpenVINO CPU MobilenetSSD AI thread using " + aiStr + " is running...")
     cfps = FPS().start()
-    while __Thread__:
+    while __Thread__ and not QUIT:
         cameraLock.acquire()
         cq=nextCamera
         nextCamera = (nextCamera+1)%Ncameras

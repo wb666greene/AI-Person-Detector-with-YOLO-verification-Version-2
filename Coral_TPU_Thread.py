@@ -24,6 +24,9 @@ __Color__ = (0, 200, 200)
 
 global model
 
+global QUIT
+QUIT = False
+
 try:
         from pycoral.adapters.common import input_size
         from pycoral.adapters.detect import get_objects
@@ -44,7 +47,8 @@ one time code to run when thread is launched.
 '''
 def threadInit():
     global model
-
+    global QUIT
+    
     try:
         print('Edgetpu_api version: ' + edgetpu_version)
         # list installed tpus, and figure out if any are M.2 (pci)
@@ -52,6 +56,10 @@ def threadInit():
         usb_tpu = list()
         tpus = list_edge_tpus()
         print(tpus)
+        if len(tpus) ==0:
+            print('[Error] No Coral TPUs found! Did you forget to plug it in?')
+            print('    Or did you forget to do the apex driver installation for M.2 TPUs?')
+            return
         for i in range(len(tpus)):
             if tpus[i]['type'] == 'pci': pci_tpu.append(i)
             if tpus[i]['type'] == 'usb': usb_tpu.append(i)
@@ -71,7 +79,7 @@ def threadInit():
     except Exception as e:
         print(e)
         print("[ERROR] Couldn't instance TPU model!  Exiting ...")
-        quit()  
+        QUIT = True
     return
 
 
@@ -144,6 +152,7 @@ def AI_thread(results, inframe, cameraLock, nextCamera, Ncameras,
     global __DEBUG__
     global __Color__
     global model
+    global QUIT
     
     aiStr=dnnStr
     waits=0
@@ -164,7 +173,7 @@ def AI_thread(results, inframe, cameraLock, nextCamera, Ncameras,
 
     __Thread__ = True
     cfps = FPS().start()
-    while __Thread__ is True:
+    while __Thread__ is True and not QUIT:
         cameraLock.acquire()
         cq=nextCamera
         nextCamera = (nextCamera+1)%Ncameras

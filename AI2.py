@@ -621,9 +621,6 @@ def main():
         yolo8OpenvinoVerification_Thread.__verifyConf__ = yoloVerifyConf
             
     # *** setup and start Coral AI threads
-    # Might consider moving this into the thread function.
-    ### Setup Coral AI
-    # initialize the labels dictionary
     if nCoral is True:
         print("\n[INFO] starting Coral TPU AI Thread ...")
         client.publish("AI/Status", "Starting Coral TPU thread.", 2, True)
@@ -643,11 +640,13 @@ def main():
         while Coral_TPU_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
-            if sleepCount >= 15:
+            client.publish("AI/Status", "Coral TPU Thread is starting " + str(sleepCount), 2, True)
+            if sleepCount >= 30:
                 client.publish("AI/Status", "[ERROR] Coral_TPU_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] Coral_TPU_Thread failed to start, exiting...')
                 QUIT = True
-    client.publish("AI/Status", "Coral TPU thread is running.", 2, True)
+        if not QUIT:
+            client.publish("AI/Status", "Coral TPU thread is running.", 2, True)
 
     # ** setup and start openvino CPU AI thread.
     if nCPUthreads is True:
@@ -680,16 +679,18 @@ def main():
                     client.publish("AI/Status", "Converting MobilenetSSD_v2 working...", 2, True)
                 else:
                     client.publish("AI/Status", "Converting MobilenetSSD_v2 still working...", 2, True)
-                toggle = (toggle+1)%2    
+                toggle = (toggle+1)%2
+            client.publish("AI/Status", "OpenVINO CPU Thread is starting " + str(sleepCount), 2, True)    
             if sleepCount >= 30:
                 client.publish("AI/Status", "[ERROR] OpenVINO_SSD_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] OpenVINO_SSD_Thread failed to start, exiting...')
                 QUIT = True
-        client.publish("AI/Status", "OpenVINO MobilenetSSD_v2 thread is running.", 2, True)
+        if not QUIT:
+            client.publish("AI/Status", "OpenVINO MobilenetSSD_v2 thread is running.", 2, True)
             
 
     if OVyolo8_verify:
-        # Start dopenvino yolo8 thread
+        # Start openvino yolo8 thread
         print("\n[INFO] OpenVINO yolo_v8 verification thread is starting ... ")
         client.publish("AI/Status", "Starting OpenVINO yolo8 verification thread.", 2, True)
         yolo8ov=list()
@@ -700,6 +701,7 @@ def main():
         while yolo8OpenvinoVerification_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
+            client.publish("AI/Status", "OpenVINO yolo8 verification thread starting " + str(sleepCount), 2, True)
             while yolo8OpenvinoVerification_Thread.__CONVERTING__ is True:
                 if sleepCount == 1:
                     print('Downloading and converting yolo8 openvino model, be patient!')
@@ -711,13 +713,15 @@ def main():
                     client.publish("AI/Status", "Converting openvino yolo8 working...", 2, True)
                 else:
                     client.publish("AI/Status", "Converting openvino yolo8 still working...", 2, True)
-                toggle = (toggle+1)%2    
+                toggle = (toggle+1)%2
+            client.publish("AI/Status", "OpenVINO yolo8 verification starting " + str(sleepCount), 2, True)    
             if sleepCount >= 30:
                 print('[ERROR] OpenVINO yolo8 thread failed to start, exiting...')
                 client.publish("AI/Status", "[ERROR] OpenVINO yolo8 thread failed to start, exiting...", 2, True)
                 QUIT = True
-        print("[INFO] OpenVINO yolo_v8 verification thread is running. ")
-        client.publish("AI/Status", "OpenVINO yolo8 verification thread is running.", 2, True)
+        if not QUIT:
+            print("[INFO] OpenVINO yolo_v8 verification thread is running. ")
+            client.publish("AI/Status", "OpenVINO yolo8 verification thread is running.", 2, True)
 
 
     if yolo8_verify or TPUyolo8_verify:
@@ -747,7 +751,8 @@ def main():
                     client.publish("AI/Status", "Converting yolo8 model working...", 2, True)
                 else:
                     client.publish("AI/Status", "Converting yolo8 still working...", 2, True)
-                toggle = (toggle+1)%2    
+                toggle = (toggle+1)%2
+            client.publish("AI/Status", "Yolo8 verification thread starting " + str(sleepCount), 2, True)    
             if sleepCount >= 30:
                 if TPUyolo8_verify:
                     client.publish("AI/Status", "[ERROR] TPU yolo8 thread failed to start, exiting...", 2, True)
@@ -756,12 +761,14 @@ def main():
                     client.publish("AI/Status", "[ERROR] CUDA yolo8 thread failed to start, exiting...", 2, True)
                     print('[ERROR] CUDA yolo8 thread failed to start, exiting...')
                 QUIT = True
-        if TPUyolo8_verify:
-            client.publish("AI/Status", "Ultralytics TPU yolo8 verification thread is running.", 2, True)
-        else:
-            # Start Ultralytics yolo8 verification thread
-            client.publish("AI/Status", "Ultralytics CUDA yolo8 verification thread is running.", 2, True)
-        print("[INFO] Ultralytics yolo_v8 verification thread is running. ")
+        if not QUIT:
+            if TPUyolo8_verify:
+                client.publish("AI/Status", "Ultralytics TPU yolo8 verification thread is running.", 2, True)
+                print("[INFO] Ultralytics TPU yolo_v8 verification thread is running. ")
+            else:
+                # Start Ultralytics yolo8 verification thread
+                client.publish("AI/Status", "Ultralytics CUDA yolo8 verification thread is running.", 2, True)
+                print("[INFO] Ultralytics CUDA yolo_v8 verification thread is running. ")
 
 
 

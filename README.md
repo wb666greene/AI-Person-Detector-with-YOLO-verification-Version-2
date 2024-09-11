@@ -403,7 +403,7 @@ sudo ln -s /home/YourUserName /home/ai
 To install the basic controller, open web browser (Chromium is recommended) and point it at YourHostName:1880 (or localhost:1880 if not installing remotely) and follow through the "Welcome to Node-RED 4.0" steps to see what is new and different from prior versions. When you get the "projects" do "Create Project" and fill in the dialogs.  I chose NO to security and encryption since no external connections are accepted by my firewall, do what works for you.
 
 Open the node-red "Hamburger" (three parallel bars) menu in the upper right corner of the editor and select "Import".  Press the "new flow" buton in the dialog box click the "select a file to import" button.  Navigate to the BasicAI2Controller.json. file.  Afterwards, click the Deploy button and you should be ready to go.  you'll have to set up the Email addresses in the "Setup Email" node and set up your smtp Email account credentials in the "Email Notification" node.  You will also have to edit the AI2/StartAI.sh file to use the correct options to start the AI2 Python code, hopefully the comments in the file help guide you.
-#### If "headless" remove the password prompt from the sudo command.  This is required for the Reboot.sh and PowerOff.sh scripts to work when launced from node-red UI.
+#### If "headless" remove the password prompt from the sudo command.  This is required for the Reboot.sh and PowerOff.sh scripts to work when launched from node-red UI.
 ```
 # This is sucidial if host machine accepts connections from outside your subnet!
 sudo visudo

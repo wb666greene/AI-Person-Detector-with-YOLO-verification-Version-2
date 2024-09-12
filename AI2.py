@@ -621,7 +621,7 @@ def main():
         yolo8OpenvinoVerification_Thread.__verifyConf__ = yoloVerifyConf
             
     # *** setup and start Coral AI threads
-    if nCoral is True:
+    if nCoral is True and not QUIT:
         print("\n[INFO] starting Coral TPU AI Thread ...")
         client.publish("AI/Status", "Starting Coral TPU thread.", 2, True)
         import Coral_TPU_Thread
@@ -645,11 +645,12 @@ def main():
                 client.publish("AI/Status", "[ERROR] Coral_TPU_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] Coral_TPU_Thread failed to start, exiting...')
                 QUIT = True
+                break
         if not QUIT:
             client.publish("AI/Status", "Coral TPU thread is running.", 2, True)
 
     # ** setup and start openvino CPU AI thread.
-    if nCPUthreads is True:
+    if nCPUthreads is True and not QUIT:
         print("\n[INFO] starting OpenVINO CPU AI Thread ...")
         client.publish("AI/Status", "Starting OpenVINO MobilenetSSD_v2 thread.", 2, True)
         import OpenVINO_SSD_Thread
@@ -686,11 +687,12 @@ def main():
                 client.publish("AI/Status", "[ERROR] OpenVINO_SSD_Thread failed to start, exiting...", 2, True)
                 print('[ERROR] OpenVINO_SSD_Thread failed to start, exiting...')
                 QUIT = True
+                break
         if not QUIT:
             client.publish("AI/Status", "OpenVINO MobilenetSSD_v2 thread is running.", 2, True)
             
 
-    if OVyolo8_verify:
+    if OVyolo8_verify and not QUIT:
         # Start openvino yolo8 thread
         print("\n[INFO] OpenVINO yolo_v8 verification thread is starting ... ")
         client.publish("AI/Status", "Starting OpenVINO yolo8 verification thread.", 2, True)
@@ -721,12 +723,13 @@ def main():
                 print('[ERROR] OpenVINO yolo8 thread failed to start, exiting...')
                 client.publish("AI/Status", "[ERROR] OpenVINO yolo8 thread failed to start, exiting...", 2, True)
                 QUIT = True
+                break
         if not QUIT:
             print("[INFO] OpenVINO yolo_v8 verification thread is running. ")
             client.publish("AI/Status", "OpenVINO yolo8 verification thread is running.", 2, True)
 
 
-    if yolo8_verify or TPUyolo8_verify:
+    if (yolo8_verify or TPUyolo8_verify) and not QUIT:
         if TPUyolo8_verify:
             print("\n[INFO] Ultralytics TPU yolo_v8 verification thread is starting... ")
             client.publish("AI/Status", "Starting Ultralytics TPU yolo8 verification Thread.", 2, True)
@@ -764,6 +767,7 @@ def main():
                     client.publish("AI/Status", "[ERROR] CUDA yolo8 thread failed to start, exiting...", 2, True)
                     print('[ERROR] CUDA yolo8 thread failed to start, exiting...')
                 QUIT = True
+                break
         if not QUIT:
             if TPUyolo8_verify:
                 client.publish("AI/Status", "Ultralytics TPU yolo8 verification thread is running.", 2, True)
@@ -784,7 +788,7 @@ def main():
     # *** start camera reading threads
     ### Try moving camera threads start up until after verification thread started
     o = list()
-    if Nonvif > 0:
+    if Nonvif > 0 and not QUIT:
         import onvif_Thread
         print("\n[INFO] starting " + str(Nonvif) + " Onvif Camera Threads ...")
         client.publish("AI/Status", "Starting " + str(Nonvif) + " Onvif Camera Threads...", 2, True)
@@ -793,7 +797,7 @@ def main():
             o.append(Thread(target=onvif_Thread.onvif_thread, args=(inframeQ[i], i, CameraURL[i])))
             o[i].start()
         time.sleep(1.0)     # so node-red UI can have a chance to see the message.
-    if Nrtsp+Nfisheye > 0:
+    if Nrtsp+Nfisheye > 0 and not QUIT:
         global threadLock
         global threadsRunning
         threadLock = Lock()

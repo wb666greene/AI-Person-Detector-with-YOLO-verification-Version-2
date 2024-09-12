@@ -665,14 +665,15 @@ def main():
         CPUt[0].start()
         # wait for OpenVINO_SSD_Thread to start, so I can see any error messages can be tough to tell which thread they are from.
         sleepCount=0
+        converting=0
         while OpenVINO_SSD_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
             while OpenVINO_SSD_Thread.__CONVERTING__ is True:
-                if sleepCount == 1:
+                if converting == 0:
                     print('Converting MobilenetSSD_v2 to openvino, be patient!')
                     client.publish("AI/Status", "Converting MobilenetSSD_v2 to openvino, be patient!", 2, True)
-                    sleepCount+=1
+                    converting=1
                     toggle = 1
                 time.sleep(3.0)
                 if toggle == 1:
@@ -698,15 +699,16 @@ def main():
         yolo8ov[0].start()
         # wait for yolo thread to be running
         sleepCount=0
+        converting=0
         while yolo8OpenvinoVerification_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
             client.publish("AI/Status", "OpenVINO yolo8 verification thread starting " + str(sleepCount), 2, True)
             while yolo8OpenvinoVerification_Thread.__CONVERTING__ is True:
-                if sleepCount == 1:
+                if converting == 0:
                     print('Downloading and converting yolo8 openvino model, be patient!')
                     client.publish("AI/Status", "Converting Ultralytics OpenVINO Yolo8 model, be patient!", 2, True)
-                    sleepCount+=1   
+                    converting=1   
                     toggle = 1
                 time.sleep(3.0)
                 if toggle == 1:
@@ -737,14 +739,15 @@ def main():
         yolo8[0].start()
         # wait for yolo thread to be running
         sleepCount=0
+        converting=0
         while yolo8_verification_Thread.__Thread__ is False:
             sleepCount+=1
             time.sleep(1.0)
             while yolo8_verification_Thread.__CONVERTING__ is True:
-                if sleepCount == 1:
+                if converting == 0:
                     print('Downloading and converting yolo8 model, be patient!')
                     client.publish("AI/Status", "Converting Ultralytics model, be patient!", 2, True)
-                    sleepCount+=1
+                    converting=1
                     toggle = 1
                 time.sleep(3.0)
                 if toggle == 1:

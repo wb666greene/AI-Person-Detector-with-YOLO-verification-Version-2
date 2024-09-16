@@ -78,8 +78,8 @@ sudo apt install gasket-dkms
 ```
 NOTE: the dkms build fails on kernel v6.+ what worked to fix it:
 ```
-sudo apt remove gasket-dkms     # only if you did apt install gasket-dms on v6+ kernel
-sudo apt install devscripts debhelper -y
+sudo apt remove gasket-dkms     # only if you did apt install gasket-dkms on v6+ kernel
+sudo apt install dkms devscripts debhelper -y
 git clone https://github.com/google/gasket-driver.git
 cd gasket-driver; debuild -us -uc -tc -b; cd ..
 sudo dpkg -i gasket-dkms_1.0-18_all.deb

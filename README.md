@@ -53,8 +53,9 @@ Now in a terminl window or your remote shell login, install these extra packages
 sudo apt install git curl samba python3-dev python3-pip python3.10-venv espeak mosquitto mosquitto-dev mosquitto-clients cmake
 # if using 20.04 change python3.10-venv to python3.8-venv in the above command.
 ```
-# 1b) Setup to use the Coral TPU if you plan to use one for SSD or YOLO8.
-NOTE: on my i9-12900 I get ~42 frames per second for MobilenetSSD_v2 with both OpenVINO CPU and Coral TPU, but I believe that this is limited by the aggregate frame rate of my six onvif cameras.  It is on lesser hardware, like i3, where the TPU is well worth its modest cost, adding two lets you do yolo8 on the TPU as well.
+# 1b) Setup to use the Coral TPU if you plan to use one for SSD or YOLO8 or both with two TPUs.
+NOTE: on my i9-12900 I get ~42 frames per second for MobilenetSSD_v2 with both OpenVINO CPU and Coral TPU, but I believe that this is limited by the aggregate frame rate of my six onvif cameras.  On lesser hardware, like i3, is where the TPU is well worth its modest cost, adding two lets you do yolo8 on the TPU as well which then brings any machine capable of decoding the number of video streams you require into the mix.
+2APR2026 -- Ultralytis will attempt to download code an convert their model for the edgetpu, this requires the edgetpu-complier and installing it did not work. I copied my yolov8s_saved_model folder (158MB) from another, older 22.04 installation from when the compiler was available.  I belive there are instructions on the Ultralytics site to "convert" the model using Google Colab.
 
 Add the "current" coral repo:
 ```

@@ -149,15 +149,17 @@ Use pip to install the needed modules:
 ```
 pip install -U pip setuptools
 pip install imutils paho-mqtt requests
-pip install opencv-python
-pip install "openvino>=2024.2.0" "nncf>=2.9.0"
-pip install "torch>=2.1" "torchvision>=0.16" "ultralytics==8.2.24" onnx tqdm opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
+pip install "openvino==2024.3.0" "nncf==2.12.0"
+pip install "openvino-dev==2024.3.0"
+pip install "opencv-python==4.10.0.84"
+pip install "torch==2.4.0" "torchvision==0.19" "ultralytics==8.2.24" onnx tqdm opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
+
 # if using TPU
 pip install TPU_python3.10/tflite_runtime-2.5.0.post1-cp310-cp310-linux_x86_64.whl
 pip install TPU_python3.10/pycoral-2.0.0-cp310-cp310-linux_x86_64.whl
-# or if using 20.04, easier but doesn't support newer than python 3.9
-python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 
+# or if using Ubuntu 20.04, easier but doesn't support newer than python 3.9
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral~=2.0
 ```
 If necessary, exit the virtual environment with "deactive" and the (y8ovv) prefix should disappear from the prompt.
 
